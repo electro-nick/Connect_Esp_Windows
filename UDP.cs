@@ -10,6 +10,9 @@ namespace WindowsFormsApp1
     class ServerData
     {
         public bool power = false;
+        public byte brightness = 0;
+        public int mode = 0;
+        public int[] color = { 0, 0, 0 };
     }
     class UDP
     {
@@ -122,7 +125,7 @@ namespace WindowsFormsApp1
         public ServerData GetServerData()
         {
             ServerData serverData = new ServerData();
-            byte[] data = Encoding.UTF8.GetBytes("{key:'getPowerState', value: ''}");
+            byte[] data = Encoding.UTF8.GetBytes("{key:'getState', value: ''}");
             using (Socket server = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 try

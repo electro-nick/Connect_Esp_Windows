@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using System.Windows.Threading;
 
 namespace WindowsFormsApp1
 {
@@ -13,6 +13,26 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
             getServerDataOnInterval();
+        }
+
+        void getServerDataOnInterval()
+        {
+            Timer timer;
+            timer = new Timer();
+            timer.Interval = 1000;
+            timer.Tick += new EventHandler(TimerEventProcessor);
+            timer.Start();
+        }
+
+        private void TimerEventProcessor(object sender, EventArgs e)
+        {
+            ServerData serverData = udp.GetServerData();
+            label4.Text = serverData.power ? "Вкл" : "Выкл";
+            trackBar1.Value = serverData.brightness;
+            comboBox1.SelectedIndex = serverData.mode - 1;
+            if (serverData.color[0] == 255) comboBox2.SelectedIndex = 0;
+            if (serverData.color[1] == 255) comboBox2.SelectedIndex = 1;
+            if (serverData.color[2] == 255) comboBox2.SelectedIndex = 2;
         }
 
         private void button1_Click(object s, EventArgs e)
@@ -38,27 +58,67 @@ namespace WindowsFormsApp1
             udp.Send("mode", index);
         }
 
-        void getServerDataOnInterval()
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Timer timer;
-            timer = new Timer();
-            timer.Interval = 1000;
-            timer.Tick += new EventHandler(TimerEventProcessor);
-            timer.Start();
-        }
-
-        private void TimerEventProcessor(object sender, EventArgs e)
-        {
-            ServerData serverData = udp.GetServerData();
-            if(serverData.power)
+            ComboBox box = sender as ComboBox;
+            switch(box.SelectedIndex)
             {
-                label4.Text = "On";
-            } else
-            {
-                label4.Text = "Off";
+                case 0: 
+                    udp.Send("color", "255 0 0");
+                break;
+                case 1:
+                    udp.Send("color", "0 255 0");
+                break;
+                case 2:
+                    udp.Send("color", "0 0 255");
+                break;
             }
         }
 
-        
+        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
+        private static extern IntPtr CreateRoundRectRgn
+        (
+            int nLeftRect,     // x-coordinate of upper-left corner
+            int nTopRect,      // y-coordinate of upper-left corner
+            int nRightRect,    // x-coordinate of lower-right corner
+            int nBottomRect,   // y-coordinate of lower-right corner
+            int nWidthEllipse, // height of ellipse
+            int nHeightEllipse // width of ellipse
+        );
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+            Panel panel = (Panel)sender;
+            panel.BorderStyle = BorderStyle.None;
+            panel.Region = System.Drawing.Region.FromHrgn(CreateRoundRectRgn(0, 0, panel.Width, panel.Height, 10, 10));
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+            Panel panel = (Panel)sender;
+            panel.BorderStyle = BorderStyle.None;
+            panel.Region = System.Drawing.Region.FromHrgn(CreateRoundRectRgn(0, 0, panel.Width, panel.Height, 10, 10));
+        }
+
+        private void panel3_Paint(object sender, PaintEventArgs e)
+        {
+            Panel panel = (Panel)sender;
+            panel.BorderStyle = BorderStyle.None;
+            panel.Region = System.Drawing.Region.FromHrgn(CreateRoundRectRgn(0, 0, panel.Width, panel.Height, 10, 10));
+        }
+
+        private void panel4_Paint(object sender, PaintEventArgs e)
+        {
+            Panel panel = (Panel)sender;
+            panel.BorderStyle = BorderStyle.None;
+            panel.Region = System.Drawing.Region.FromHrgn(CreateRoundRectRgn(0, 0, panel.Width, panel.Height, 10, 10));
+        }
+
+        private void panel5_Paint(object sender, PaintEventArgs e)
+        {
+            Panel panel = (Panel)sender;
+            panel.BorderStyle = BorderStyle.None;
+            panel.Region = System.Drawing.Region.FromHrgn(CreateRoundRectRgn(0, 0, panel.Width, panel.Height, 10, 10));
+        }
     }
 }
